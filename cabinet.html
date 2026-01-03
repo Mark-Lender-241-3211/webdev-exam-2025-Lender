@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
     <!-- Шапка -->
     <header class="bg-primary text-white py-3">
         <div class="container d-flex justify-content-between align-items-center">
@@ -18,7 +17,9 @@
             <nav>
                 <ul class="nav">
                     <li class="nav-item"><a class="nav-link text-white" href="index.html">Главная</a></li>
-                    <li class="nav-item"><a class="nav-link text-white" href="#contacts">Контакты</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="index.html #about">О нас</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="index.html #contacts">Контакты</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="cabinet.html">Личный кабинет</a></li>
                 </ul>
             </nav>
         </div>
@@ -31,7 +32,6 @@
     <section class="py-5">
         <div class="container">
             <h2 class="text-center mb-4">Мои заявки</h2>
-
             <!-- Таблица заявок -->
             <div class="table-responsive">
                 <table class="table table-bordered" id="orders-table">
@@ -49,14 +49,12 @@
                     </tbody>
                 </table>
             </div>
-
             <!-- Пагинация -->
             <nav aria-label="Пагинация заявок">
                 <ul class="pagination justify-content-center mt-4" id="orders-pagination">
                     <!-- Генерируется JS -->
                 </ul>
             </nav>
-
             <!-- Если заявок нет -->
             <div id="no-orders" class="text-center text-muted d-none">
                 <p>У вас пока нет заявок.</p>
@@ -109,14 +107,122 @@
         </div>
     </div>
 
+    <!-- === ВАЖНО: МОДАЛЬНОЕ ОКНО ЗАЯВКИ (скопировано из index.html) === -->
+    <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderModalLabel">Оформление заявки</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Тип заявки -->
+                    <div class="mb-3">
+                        <label class="form-label">Тип заявки</label>
+                        <select class="form-select" id="order-type" required>
+                            <option value="">Выберите...</option>
+                            <option value="course">Курс</option>
+                            <option value="tutor">Репетитор</option>
+                        </select>
+                    </div>
+                    <!-- Выбор курса -->
+                    <div class="mb-3" id="course-select-group" style="display:none;">
+                        <label class="form-label">Курс</label>
+                        <select class="form-select" id="order-course" required>
+                            <option value="">Выберите курс</option>
+                        </select>
+                    </div>
+                    <!-- Выбор репетитора -->
+                    <div class="mb-3" id="tutor-select-group" style="display:none;">
+                        <label class="form-label">Репетитор</label>
+                        <select class="form-select" id="order-tutor" required>
+                            <option value="">Выберите репетитора</option>
+                        </select>
+                    </div>
+                    <!-- Название (только для чтения) -->
+                    <div class="mb-3">
+                        <label class="form-label">Название</label>
+                        <input type="text" class="form-control" id="order-name" readonly>
+                    </div>
+                    <!-- Преподаватель -->
+                    <div class="mb-3">
+                        <label class="form-label">Преподаватель</label>
+                        <input type="text" class="form-control" id="order-teacher" readonly>
+                    </div>
+                    <!-- Дата -->
+                    <div class="mb-3">
+                        <label class="form-label">Дата начала</label>
+                        <input type="date" class="form-control" id="order-date" required>
+                    </div>
+                    <!-- Время -->
+                    <div class="mb-3">
+                        <label class="form-label">Время начала</label>
+                        <select class="form-select" id="order-time" required>
+                            <option value="">Выберите время</option>
+                        </select>
+                    </div>
+                    <!-- Продолжительность -->
+                    <div class="mb-3">
+                        <label class="form-label">Продолжительность (часов)</label>
+                        <input type="number" class="form-control" id="order-duration" readonly>
+                    </div>
+                    <!-- Количество студентов -->
+                    <div class="mb-3">
+                        <label class="form-label">Количество студентов (1–20)</label>
+                        <input type="number" class="form-control" id="order-persons" min="1" max="20" value="1" required>
+                    </div>
+                    <!-- Дополнительные опции -->
+                    <div class="mb-3">
+                        <label class="form-label">Дополнительные опции</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="opt-supplementary">
+                            <label class="form-check-label" for="opt-supplementary">Доп. материалы (+2000 ₽/студент)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="opt-personalized">
+                            <label class="form-check-label" for="opt-personalized">Индивидуальные занятия (+1500 ₽/неделя)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="opt-excursions">
+                            <label class="form-check-label" for="opt-excursions">Культурные экскурсии (+25%)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="opt-assessment">
+                            <label class="form-check-label" for="opt-assessment">Оценка уровня (+300 ₽)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="opt-interactive">
+                            <label class="form-check-label" for="opt-interactive">Интерактивная платформа (+50%)</label>
+                        </div>
+                    </div>
+                    <!-- Скидки и надбавки (автоматические) -->
+                    <div class="alert alert-info" id="auto-benefits" style="display:none;">
+                        Автоматически применены:
+                        <span id="benefit-text"></span>
+                    </div>
+                    <!-- Итоговая стоимость -->
+                    <div class="mb-3">
+                        <label class="form-label">Общая стоимость</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="order-total" readonly>
+                            <span class="input-group-text">₽</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" id="order-submit">Отправить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
     <!-- Скрипты -->
     <script src="js/api.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/orderForm.js"></script>
     <script src="js/cabinet.js"></script>
-
 </body>
 </html>

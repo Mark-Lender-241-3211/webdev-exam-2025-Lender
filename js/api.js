@@ -1,7 +1,7 @@
 // js/api.js
 
 const API_BASE = 'http://exam-api-courses.std-900.ist.mospolytech.ru';
-const API_KEY = '0f2152ae-2c33-46cc-94d9-51656c675b81';
+const API_KEY = '4a4017d0-af17-40d9-af18-96b0550c49a9';
 
 /**
  * Унифицированный запрос к API с поддержкой ошибок
