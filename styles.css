@@ -8,17 +8,12 @@ body {
   margin-bottom: 0.5rem;
 }
 
-/* Адаптивность таблицы — уже есть в Bootstrap, но оставим для ясности */
-.table td, .table th {
-  vertical-align: middle;
-}
-
 /* Кнопка "Оформить заявку" — выделена */
 .btn-success {
   font-weight: bold;
 }
 
-/* Заглушка: выделение выбранного репетитора (пока неактивно) */
+/* Выделение выбранного репетитора */
 .table tr.selected {
   background-color: #d1ecf1;
 }

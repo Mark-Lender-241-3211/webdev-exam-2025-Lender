@@ -1,17 +1,10 @@
-// js/orderForm.js
-
 // === ПРОВЕРКА НАЛИЧИЯ МОДАЛЬНОГО ОКНА ===
-// Если элемент #orderModal не существует — не выполняем код формы
 if (!document.getElementById('orderModal')) {
-    // Не загружаем форму на странице кабинета
     console.log('Форма заявки не доступна на этой странице.');
-    window.handleCreateOrder = function() {}; // Заглушка, если где-то будет вызвана
+    window.handleCreateOrder = function() {};
     window.handleUpdateOrder = function() {};
-    // Другие глобальные функции можно тоже заглушить, если нужно
     window.resetOrderForm = function() {};
 }
-
-// === ОСТАЛЬНОЙ КОД ОСТАЁТСЯ БЕЗ ИЗМЕНЕНИЙ ===
 
 let selectedCourse = null;
 let selectedTutor = null;
@@ -69,7 +62,7 @@ function resetOrderForm() {
  * Обновление селектов
  */
 function updateCourseOptions() {
-    if (!orderCourseSelect) return; // Защита
+    if (!orderCourseSelect) return;
     orderCourseSelect.innerHTML = '<option value="">Выберите курс</option>';
     allCourses.forEach(course => {
         const opt = document.createElement('option');
@@ -80,7 +73,7 @@ function updateCourseOptions() {
 }
 
 function updateTutorOptions() {
-    if (!orderTutorSelect) return; // Защита
+    if (!orderTutorSelect) return;
     orderTutorSelect.innerHTML = '<option value="">Выберите репетитора</option>';
     allTutors.forEach(tutor => {
         const opt = document.createElement('option');
@@ -91,16 +84,168 @@ function updateTutorOptions() {
 }
 
 /**
- * Заполнение времени (курс)
+ * Устанавливает время по умолчанию 09:00 для курса
  */
-function fillDateOptions(startDates) {
-    if (!orderDateInput || !orderTimeSelect) return; // Защита
-    const uniqueDates = [...new Set(startDates.map(dt => dt.split('T')[0]))];
-    orderDateInput.value = '';
-    orderTimeSelect.innerHTML = '<option value="">Выберите время</option>';
+function setDefaultCourseTime() {
+    // Добавляем 09:00, если его нет
+    if (!orderTimeSelect.querySelector('option[value="09:00"]')) {
+        const opt = document.createElement('option');
+        opt.value = '09:00';
+        opt.textContent = '09:00';
+        orderTimeSelect.appendChild(opt);
+    }
+    orderTimeSelect.value = '09:00';
 }
 
-// === ВАЖНО: Проверяем наличие элементов перед добавлением обработчиков ===
+// === ОБРАБОТЧИК ИЗМЕНЕНИЯ ТИПА ЗАЯВКИ ===
+if (orderTypeSelect) {
+    orderTypeSelect.addEventListener('change', () => {
+        const type = orderTypeSelect.value;
+        if (type === 'course') {
+            courseSelectGroup.style.display = 'block';
+            tutorSelectGroup.style.display = 'none';
+            orderNameInput.parentElement.style.display = 'block'; // Показываем "Название"
+            // Сброс
+            selectedCourse = null;
+            selectedTutor = null;
+            orderCourseSelect.value = '';
+            orderTutorSelect.value = '';
+            orderNameInput.value = '';
+            orderTeacherInput.value = '';
+            orderDurationInput.value = '';
+            orderDateInput.value = '';
+            orderTimeSelect.innerHTML = '<option value="">Выберите время</option>';
+            setDefaultCourseTime(); // ← Устанавливаем 09:00 сразу
+            orderTotalInput.value = '';
+            optSupplementary.checked = false;
+            optPersonalized.checked = false;
+            optExcursions.checked = false;
+            optAssessment.checked = false;
+            optInteractive.checked = false;
+            autoBenefitsEl.style.display = 'none';
+        } else if (type === 'tutor') {
+            courseSelectGroup.style.display = 'none';
+            tutorSelectGroup.style.display = 'block';
+            orderNameInput.parentElement.style.display = 'none'; // Скрываем "Название"
+            // Сброс
+            selectedCourse = null;
+            selectedTutor = null;
+            orderCourseSelect.value = '';
+            orderTutorSelect.value = '';
+            orderNameInput.value = '';
+            orderTeacherInput.value = '';
+            orderDurationInput.value = '';
+            orderDateInput.value = '';
+            orderTimeSelect.innerHTML = '<option value="">Выберите время</option>';
+            // Для репетитора не ставим 09:00 автоматически — пользователь сам выбирает
+            orderTotalInput.value = '';
+            optSupplementary.checked = false;
+            optPersonalized.checked = false;
+            optExcursions.checked = false;
+            optAssessment.checked = false;
+            optInteractive.checked = false;
+            autoBenefitsEl.style.display = 'none';
+        } else {
+            courseSelectGroup.style.display = 'none';
+            tutorSelectGroup.style.display = 'none';
+            orderNameInput.parentElement.style.display = 'block';
+            // Сброс
+            selectedCourse = null;
+            selectedTutor = null;
+            orderCourseSelect.value = '';
+            orderTutorSelect.value = '';
+            orderNameInput.value = '';
+            orderTeacherInput.value = '';
+            orderDurationInput.value = '';
+            orderDateInput.value = '';
+            orderTimeSelect.innerHTML = '<option value="">Выберите время</option>';
+            orderTotalInput.value = '';
+            optSupplementary.checked = false;
+            optPersonalized.checked = false;
+            optExcursions.checked = false;
+            optAssessment.checked = false;
+            optInteractive.checked = false;
+            autoBenefitsEl.style.display = 'none';
+        }
+    });
+}
+
+// === ОБРАБОТЧИК ВЫБОРА КУРСА ИЗ СПИСКА ===
+if (orderCourseSelect) {
+    orderCourseSelect.addEventListener('change', () => {
+        const courseId = parseInt(orderCourseSelect.value);
+        if (courseId) {
+            selectedCourse = allCourses.find(c => c.id === courseId);
+            selectedTutor = null;
+            orderNameInput.value = selectedCourse.name;
+            orderTeacherInput.value = selectedCourse.teacher;
+            orderDurationInput.value = selectedCourse.week_length * selectedCourse.total_length;
+            orderDateInput.value = '';
+            orderTimeSelect.innerHTML = '<option value="">Выберите время</option>';
+            setDefaultCourseTime(); // ← Обязательно 09:00
+            orderTotalInput.value = '';
+            optSupplementary.checked = false;
+            optPersonalized.checked = false;
+            optExcursions.checked = false;
+            optAssessment.checked = false;
+            optInteractive.checked = false;
+            autoBenefitsEl.style.display = 'none';
+        } else {
+            selectedCourse = null;
+            orderNameInput.value = '';
+            orderTeacherInput.value = '';
+            orderDurationInput.value = '';
+            orderDateInput.value = '';
+            orderTimeSelect.innerHTML = '<option value="">Выберите время</option>';
+            orderTotalInput.value = '';
+            optSupplementary.checked = false;
+            optPersonalized.checked = false;
+            optExcursions.checked = false;
+            optAssessment.checked = false;
+            optInteractive.checked = false;
+            autoBenefitsEl.style.display = 'none';
+        }
+    });
+}
+
+// === ОБРАБОТЧИК ВЫБОРА РЕПЕТИТОРА ИЗ СПИСКА ===
+if (orderTutorSelect) {
+    orderTutorSelect.addEventListener('change', () => {
+        const tutorId = parseInt(orderTutorSelect.value);
+        if (tutorId) {
+            selectedTutor = allTutors.find(t => t.id === tutorId);
+            selectedCourse = null;
+            orderNameInput.value = `Репетитор: ${selectedTutor.name}`;
+            orderTeacherInput.value = selectedTutor.name;
+            orderDurationInput.value = ''; // Ручной ввод
+            orderDateInput.value = '';
+            orderTimeSelect.innerHTML = '<option value="">Выберите время</option>';
+            orderTotalInput.value = '';
+            optSupplementary.checked = false;
+            optPersonalized.checked = false;
+            optExcursions.checked = false;
+            optAssessment.checked = false;
+            optInteractive.checked = false;
+            autoBenefitsEl.style.display = 'none';
+        } else {
+            selectedTutor = null;
+            orderNameInput.value = '';
+            orderTeacherInput.value = '';
+            orderDurationInput.value = '';
+            orderDateInput.value = '';
+            orderTimeSelect.innerHTML = '<option value="">Выберите время</option>';
+            orderTotalInput.value = '';
+            optSupplementary.checked = false;
+            optPersonalized.checked = false;
+            optExcursions.checked = false;
+            optAssessment.checked = false;
+            optInteractive.checked = false;
+            autoBenefitsEl.style.display = 'none';
+        }
+    });
+}
+
+// === ОБРАБОТЧИК ИЗМЕНЕНИЯ ДАТЫ ===
 if (orderDateInput) {
     orderDateInput.addEventListener('change', () => {
         const dateStr = orderDateInput.value;
@@ -115,7 +260,10 @@ if (orderDateInput) {
                 opt.textContent = t;
                 orderTimeSelect.appendChild(opt);
             });
-            orderDurationInput.value = selectedCourse.week_length * selectedCourse.total_length;
+            // Если нет доступных слотов — оставляем 09:00
+            if (times.length === 0) {
+                setDefaultCourseTime();
+            }
         } else if (selectedTutor && dateStr) {
             orderTimeSelect.innerHTML = `
                 <option value="09:00">09:00</option>
@@ -131,6 +279,7 @@ if (orderDateInput) {
                 <option value="19:00">19:00</option>
             `;
         }
+        recalculateTotal();
     });
 }
 
@@ -138,7 +287,7 @@ if (orderDateInput) {
  * Пересчёт стоимости
  */
 function recalculateTotal() {
-    if (!orderPersonsInput || !orderTotalInput) return; // Защита
+    if (!orderPersonsInput || !orderTotalInput) return;
     const persons = parseInt(orderPersonsInput.value) || 1;
     let baseRate = 0;
     let durationHours = 0;
@@ -155,16 +304,15 @@ function recalculateTotal() {
             const day = date.getDay();
             isWeekend = day === 0 || day === 6;
         }
-        const timeStr = orderTimeSelect?.value || '';
-        if (timeStr) {
-            const [hours] = timeStr.split(':').map(Number);
-            if (hours >= 9 && hours < 12) morningSurcharge = 400;
-            if (hours >= 18 && hours < 20) eveningSurcharge = 1000;
-        }
+        const timeStr = orderTimeSelect?.value || '09:00';
+        const [hours] = timeStr.split(':').map(Number);
+        if (hours >= 9 && hours < 12) morningSurcharge = 400;
+        if (hours >= 18 && hours < 20) eveningSurcharge = 1000;
     } else if (selectedTutor) {
         baseRate = selectedTutor.price_per_hour;
         durationHours = parseInt(orderDurationInput?.value) || 1;
         durationHours = Math.min(Math.max(durationHours, 1), 40);
+        orderDurationInput.value = durationHours;
         const dateStr = orderDateInput?.value || '';
         if (dateStr) {
             const date = new Date(dateStr);
@@ -185,14 +333,12 @@ function recalculateTotal() {
     let total = (baseRate * durationHours * (isWeekend ? 1.5 : 1)) + morningSurcharge + eveningSurcharge;
     total *= persons;
 
-    // Пользовательские опции
     if (optSupplementary?.checked) total += 2000 * persons;
     if (optPersonalized?.checked && selectedCourse) total += 1500 * selectedCourse.total_length;
     if (optExcursions?.checked) total *= 1.25;
     if (optAssessment?.checked) total += 300;
     if (optInteractive?.checked) total *= 1.5;
 
-    // Автоматические скидки
     let benefitText = [];
     if (selectedCourse) {
         const today = new Date();
@@ -222,7 +368,6 @@ function recalculateTotal() {
     orderTotalInput.value = Math.round(total);
 }
 
-// Слушатели для пересчёта
 [
     orderPersonsInput,
     orderDurationInput,
@@ -234,23 +379,23 @@ function recalculateTotal() {
     optAssessment,
     optInteractive
 ].forEach(el => {
-    if (el) { // Только если элемент существует
+    if (el) {
         el.addEventListener('input', recalculateTotal);
         el.addEventListener('change', recalculateTotal);
     }
 });
 
 /**
- * Создание новой заявки
+ * Создание заявки
  */
 async function handleCreateOrder() {
     const persons = parseInt(orderPersonsInput?.value) || 1;
     const dateStart = orderDateInput?.value;
-    const timeStart = orderTimeSelect?.value;
+    const timeStart = orderTimeSelect?.value || '09:00'; // fallback
     let duration = 0;
 
-    if (!dateStart || !timeStart) {
-        showNotification('Укажите дату и время', 'warning');
+    if (!dateStart) {
+        showNotification('Укажите дату начала', 'warning');
         return;
     }
 
@@ -307,16 +452,16 @@ async function handleCreateOrder() {
 }
 
 /**
- * Обновление существующей заявки
+ * Обновление заявки
  */
 async function handleUpdateOrder() {
     const persons = parseInt(orderPersonsInput?.value) || 1;
     const dateStart = orderDateInput?.value;
-    const timeStart = orderTimeSelect?.value;
+    const timeStart = orderTimeSelect?.value || '09:00';
     let duration = 0;
 
-    if (!dateStart || !timeStart) {
-        showNotification('Укажите дату и время', 'warning');
+    if (!dateStart) {
+        showNotification('Укажите дату начала', 'warning');
         return;
     }
 
@@ -377,13 +522,10 @@ async function handleUpdateOrder() {
     }
 }
 
-/**
- * Загрузка при открытии модалки
- */
+// === ЗАГРУЗКА ПРИ ОТКРЫТИИ МОДАЛЬНОГО ОКНА ===
 if (orderModal) {
     orderModal.addEventListener('show.bs.modal', async () => {
         resetOrderForm();
-
         try {
             allCourses = await apiRequest('/api/courses');
             allTutors = await apiRequest('/api/tutors');
@@ -393,7 +535,7 @@ if (orderModal) {
             console.error('Failed to load data for order form', e);
         }
 
-        // Используем предварительно выбранный курс/репетитор
+        // Предзаполнение из карточки курса
         if (window.selectedCourse) {
             selectedCourse = window.selectedCourse;
             orderTypeSelect.value = 'course';
@@ -401,20 +543,25 @@ if (orderModal) {
             tutorSelectGroup.style.display = 'none';
             orderNameInput.value = selectedCourse.name;
             orderTeacherInput.value = selectedCourse.teacher;
-        } else if (window.selectedTutor) {
+            orderDurationInput.value = selectedCourse.week_length * selectedCourse.total_length;
+            orderDateInput.value = '';
+            orderTimeSelect.innerHTML = '<option value="">Выберите время</option>';
+            setDefaultCourseTime(); // ← 09:00 всегда!
+        } 
+        // Предзаполнение из карточки репетитора
+        else if (window.selectedTutor) {
             selectedTutor = window.selectedTutor;
             orderTypeSelect.value = 'tutor';
             courseSelectGroup.style.display = 'none';
             tutorSelectGroup.style.display = 'block';
             orderNameInput.value = `Репетитор: ${selectedTutor.name}`;
             orderTeacherInput.value = selectedTutor.name;
+            orderNameInput.parentElement.style.display = 'none';
         }
 
         // Режим редактирования
         if (window.editingOrderId && window.editingOrder) {
             const order = window.editingOrder;
-
-            // Установка типа
             if (order.course_id) {
                 selectedCourse = allCourses.find(c => c.id === order.course_id);
                 orderTypeSelect.value = 'course';
@@ -425,6 +572,7 @@ if (orderModal) {
                     orderNameInput.value = selectedCourse.name;
                     orderTeacherInput.value = selectedCourse.teacher;
                 }
+                orderNameInput.parentElement.style.display = 'block';
             } else if (order.tutor_id) {
                 selectedTutor = allTutors.find(t => t.id === order.tutor_id);
                 orderTypeSelect.value = 'tutor';
@@ -435,60 +583,31 @@ if (orderModal) {
                     orderNameInput.value = `Репетитор: ${selectedTutor.name}`;
                     orderTeacherInput.value = selectedTutor.name;
                 }
+                orderNameInput.parentElement.style.display = 'none';
             }
 
-            // Заполнение остальных полей
-            if (orderDateInput) orderDateInput.value = order.date_start;
-            if (orderTimeSelect) orderTimeSelect.innerHTML = `<option value="${order.time_start}" selected>${order.time_start}</option>`;
-            if (orderDurationInput) orderDurationInput.value = order.duration;
-            if (orderPersonsInput) orderPersonsInput.value = order.persons;
-            if (orderTotalInput) orderTotalInput.value = order.price;
+            orderDateInput.value = order.date_start;
+            orderTimeSelect.innerHTML = `<option value="${order.time_start}" selected>${order.time_start}</option>`;
+            orderDurationInput.value = order.duration;
+            orderPersonsInput.value = order.persons;
+            orderTotalInput.value = order.price;
 
-            // Восстановление опций
-            if (optSupplementary) optSupplementary.checked = order.supplementary;
-            if (optPersonalized) optPersonalized.checked = order.personalized;
-            if (optExcursions) optExcursions.checked = order.excursions;
-            if (optAssessment) optAssessment.checked = order.assessment;
-            if (optInteractive) optInteractive.checked = order.interactive;
+            optSupplementary.checked = order.supplementary;
+            optPersonalized.checked = order.personalized;
+            optExcursions.checked = order.excursions;
+            optAssessment.checked = order.assessment;
+            optInteractive.checked = order.interactive;
 
-            // Обновление заголовка модалки
-            if (document.getElementById('orderModalLabel')) {
-                document.getElementById('orderModalLabel').textContent = 'Редактирование заявки';
-            }
-            if (orderSubmitBtn) {
-                orderSubmitBtn.textContent = 'Сохранить';
-                orderSubmitBtn.removeEventListener('click', handleCreateOrder);
-                orderSubmitBtn.addEventListener('click', handleUpdateOrder);
-            }
+            document.getElementById('orderModalLabel').textContent = 'Редактирование заявки';
+            orderSubmitBtn.textContent = 'Сохранить';
+            orderSubmitBtn.onclick = handleUpdateOrder;
         } else {
-            // Режим создания
-            if (document.getElementById('orderModalLabel')) {
-                document.getElementById('orderModalLabel').textContent = 'Оформление заявки';
-            }
-            if (orderSubmitBtn) {
-                orderSubmitBtn.textContent = 'Отправить';
-                orderSubmitBtn.removeEventListener('click', handleUpdateOrder);
-                orderSubmitBtn.addEventListener('click', handleCreateOrder);
-            }
+            document.getElementById('orderModalLabel').textContent = 'Оформление заявки';
+            orderSubmitBtn.textContent = 'Отправить';
+            orderSubmitBtn.onclick = handleCreateOrder;
         }
 
         delete window.selectedCourse;
         delete window.selectedTutor;
-    });
-}
-
-// === ОБРАБОТЧИК КНОПКИ ОТПРАВКИ ===
-// Этот обработчик уже привязан к кнопке в HTML, но мы его оставляем для совместимости
-// Однако, в режиме редактирования мы меняем его на handleUpdateOrder
-// Поэтому здесь оставляем только базовый обработчик, который будет переопределён в show.bs.modal
-if (orderSubmitBtn) {
-    orderSubmitBtn.addEventListener('click', async () => {
-        // Эта функция будет переопределена в show.bs.modal
-        // Но на случай, если она не была переопределена — оставим базовую логику
-        if (window.editingOrderId && window.editingOrder) {
-            await handleUpdateOrder();
-        } else {
-            await handleCreateOrder();
-        }
     });
 }
