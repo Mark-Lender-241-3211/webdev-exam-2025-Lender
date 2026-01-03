@@ -1,0 +1,24 @@
+/* Минимальные пользовательские стили */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Уведомления (позже будут управляться JS) */
+#notifications .alert {
+  margin-bottom: 0.5rem;
+}
+
+/* Адаптивность таблицы — уже есть в Bootstrap, но оставим для ясности */
+.table td, .table th {
+  vertical-align: middle;
+}
+
+/* Кнопка "Оформить заявку" — выделена */
+.btn-success {
+  font-weight: bold;
+}
+
+/* Заглушка: выделение выбранного репетитора (пока неактивно) */
+.table tr.selected {
+  background-color: #d1ecf1;
+}
