@@ -1,6 +1,5 @@
 // js/orderForm.js
 
-let allCourses = [];
 let allTutors = [];
 let selectedCourse = null;
 let selectedTutor = null;
