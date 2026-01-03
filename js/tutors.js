@@ -30,7 +30,7 @@ async function loadTutors() {
 }
 
 /**
- * Заполняет выпадающие списки языками и уровнями
+ * Заполняет выпадающие списки
  */
 function populateTutorFilters() {
     if (!allTutors.length || !tutorLangSelect || !tutorLevelSelect) return;
@@ -55,7 +55,7 @@ function populateTutorFilters() {
 }
 
 /**
- * Отображает таблицу репетиторов с фильтрацией
+ * Отображает таблицу репетиторов
  */
 function renderTutors() {
     if (!tutorsTableBody) return;
@@ -97,12 +97,20 @@ function renderTutors() {
         tutorsTableBody.appendChild(row);
     });
 
+    // Обработчик кнопки "Выбрать"
     tutorsTableBody.querySelectorAll('button[data-tutor-id]').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            selectedTutorId = parseInt(e.currentTarget.dataset.tutorId, 10);
-            const tutorName = allTutors.find(t => t.id === selectedTutorId)?.name || '—';
-            showNotification(`Выбран репетитор: ${tutorName}`, 'success');
-            renderTutors();
+            const id = parseInt(e.currentTarget.dataset.tutorId, 10);
+            const tutor = allTutors.find(t => t.id === id);
+            if (tutor) {
+                window.selectedTutor = tutor;
+                window.selectedCourse = null;
+                selectedTutorId = id;
+                renderTutors();
+
+                const modal = new bootstrap.Modal(document.getElementById('orderModal'));
+                modal.show();
+            }
         });
     });
 }

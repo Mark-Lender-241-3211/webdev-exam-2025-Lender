@@ -41,7 +41,7 @@ function applyCourseFilters() {
 }
 
 /**
- * Отображает список курсов (текущая страница)
+ * Отображает список курсов
  */
 function renderCourseList() {
     if (!coursesContainer) return;
@@ -72,9 +72,17 @@ function renderCourseList() {
         coursesContainer.appendChild(card);
     });
 
+    // Обработчик кнопки "Подать заявку"
     coursesContainer.querySelectorAll('button[data-course-id]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            showNotification('Выберите курс в форме заявки.', 'info');
+        btn.addEventListener('click', (e) => {
+            const id = parseInt(e.target.dataset.courseId, 10);
+            const course = allCourses.find(c => c.id === id);
+            if (course) {
+                window.selectedCourse = course;
+                window.selectedTutor = null;
+                const modal = new bootstrap.Modal(document.getElementById('orderModal'));
+                modal.show();
+            }
         });
     });
 }
@@ -131,7 +139,7 @@ function escapeHtml(text) {
     return text.replace(/[&<>"']/g, m => map[m]);
 }
 
-// Обработчики фильтров
+// Обработчики фильтрации
 if (courseSearchInput) {
     courseSearchInput.addEventListener('input', applyCourseFilters);
 }
